@@ -1,8 +1,21 @@
-import subprocess
-import tempfile
-from pathlib import Path
+try:
+    import cv2
+except ImportError:
+    # Cloud par libGL na ho to opencv-python ki jagah headless version laga do
+    import importlib
+    import subprocess as _sp
+    import sys as _sys
 
-import cv2
+    _sp.run([_sys.executable, "-m", "pip", "uninstall", "-y", "opencv-python"], check=False)
+    _sp.run([_sys.executable, "-m", "pip", "install", "--force-reinstall", "--no-deps",
+             "opencv-python-headless"], check=False)
+    importlib.invalidate_caches()
+    try:
+        import cv2
+    except ImportError as _e:
+        import streamlit as _st
+        _st.error(f"OpenCV load nahi hua: {_e}. Manage app > Reboot app karke dobara try karo.")
+        _st.stop()
 import imageio_ffmpeg
 import streamlit as st
 from PIL import Image
